@@ -1,4 +1,4 @@
-# ShipMate 🚀
+# ShipMate 🧉
 
 Welcome to **ShipMate**, where we believe shipping code should be as easy as pie—if pie were a complex algorithm you need to debug at 3 AM. This boilerplate is your golden ticket to web development glory, combining the powers of **PocketBase**, **PocketBase-Typegen**, **Astro**, **Tailwind**, and **Preact**. It’s like a tech bro’s dream come true, minus the overpriced coffee and fancy lattes.
 
