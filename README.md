@@ -6,10 +6,6 @@ Welcome to **ShipMate**, where we believe shipping code should be as easy as pie
 
 Because who needs sleep or sanity when you can ship code faster than you can say, “Why is my app crashing?” This little gem isn’t built for apps that scale to the moon—no, it’s more like a friendly taco stand. It can handle a good crowd, but don’t expect it to run a five-star Michelin restaurant.
 
-## Recommended: Fork the Project
-
-Before you dive in like it’s the latest TikTok trend, **fork this project**. That way, you can mess things up as much as you want without ruining the original. Think of it as your own personal playground—where the only thing you can break is your spirit when you realize you forgot to save your work!
-
 ## Getting Started
 
 Ready to embark on this chaotic adventure? Here’s how to get your ShipMate up and running without losing your mind (or your sense of humor):
