@@ -1,0 +1,23 @@
+{
+  "name": "shipmate",
+  "type": "module",
+  "scripts": {
+    "dev:ui": "bun run --cwd ui dev",
+    "dev:api": "cd api && go run main.go serve",
+    "build:ui": "bun run --cwd ui build",
+    "build:api": "cd api && go build main.go",
+    "start:ui": "bun run --cwd ui preview",
+    "start:api": "./api/main serve",
+    "dev": "bun run dev:ui & bun run dev:api",
+    "build": "bun run build:ui & bun run build:api",
+    "start": "bun run start:ui & bun run start:api",
+    "sync": "pocketbase-typegen --db api/pb_data/data.db --out ui/src/types.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest",
+    "pocketbase-typegen": "^1.2.1"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  }
+}

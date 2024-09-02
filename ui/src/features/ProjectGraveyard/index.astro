@@ -1,0 +1,82 @@
+---
+import ProjectItem from "./components/ProjectItem.tsx"
+
+const { api, token } = Astro.locals
+const projects = await api.collection("projects").getFullList()
+---
+
+<project-graveyard class="flex flex-col gap-4 p-12 rounded-2xl border-8 border-zinc-400 bg-zinc-900">
+    <h1 class="text-4xl font-extrabold">Project graveyard 🪦</h1>
+    {token ? (
+      <div id="project-list" class="flex flex-col rounded-lg my-5 gap-2">
+          {projects.map(project => (
+            <ProjectItem id={project.id} name={project.name} />
+          ))}
+      </div>
+
+      <div class="flex flex-col gap-3">
+          <input id="project-name" aria-label="Your project's name" class="bg-zinc-600 text-white placeholder-zinc-400 px-3 py-2 rounded-md focus:outline-none focus:ring-2 focus:ring-slate-500" type="text" placeholder="Tinder for dogs">
+          <button id="add-project" aria-label="Add a new project" class="bg-zinc-300 hover:bg-zinc-500 text-zinc-950 px-4 py-2 rounded-md transition duration-300 ease-in-out">
+              Add
+          </button>
+      </div>
+    ) : (
+      <h3 class="text-xl text-zinc-400 font-extrabold">Log in to add your abandonded projects...</h3>
+    )}
+</>
+
+<script>
+  import { api } from "~/services/api";
+  import { render } from "preact-render-to-string"
+  import ProjectItem from "./components/ProjectItem.tsx";
+
+  class ProjectGraveyard extends HTMLElement {
+    constructor() {
+      super();
+
+      const addButton = this.querySelector<HTMLButtonElement>("#add-project");
+      const deleteButtons = this.querySelectorAll<HTMLButtonElement>(".delete-btn");
+
+      const deleteById = async (id: string) => {
+        await api.collection("projects").delete(id);
+        const project = document.getElementById(id);
+        if (project) {
+          project.remove();
+        }
+      };
+
+      const create = async () => {
+            const projectList = this.querySelector("#project-list");
+            const name = this.querySelector<HTMLInputElement>("#project-name");
+            const authorID = api.authStore.model?.id;
+
+            if (name && authorID) {
+              const newProject = await api.collection("projects").create({
+                name: name.value,
+                authorID,
+              });
+
+              const parser = new DOMParser();
+              const projectItem  = parser.parseFromString(
+                render(ProjectItem({ id: newProject.id, name: name.value})),
+                'text/html'
+              );
+
+              const deleteButton =projectItem.querySelector<HTMLButtonElement>(".delete-btn")
+              deleteButton.onclick = () => deleteById(newProject.id);
+
+              projectList.append(projectItem.body)
+              name.value = "";
+            }
+          };
+
+      addButton.onclick = create;
+      Array.from(deleteButtons).forEach((button) => {
+        const parent = button.parentElement
+        if (parent !== null) button.onclick = () => deleteById(parent.id);
+      });
+    }
+  }
+
+  customElements.define("project-graveyard", ProjectGraveyard);
+</script>

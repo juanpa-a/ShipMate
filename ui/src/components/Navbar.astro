@@ -1,0 +1,56 @@
+---
+const { token } = Astro.locals;
+---
+
+<nav-bar class="fixed w-screen bg-zinc-950 p-4 border-b border-zinc-700">
+    <div class="container mx-auto flex justify-between items-center">
+        <div
+            class="text-white text-lg py-1 px-2 rounded-md font-bold hover:bg-zinc-600"
+        >
+            ShipMate 🧉
+        </div>
+
+        <div>
+            <button
+                id={token ? "logout" : "login"}
+                class="bg-zinc-950 hover:bg-slate-800 border border-zinc-700 text-zinc-400 transition-colors duration-200 ease-in-out hover:text-zinc-300 px-4 py-1 rounded"
+            >
+                {token ? "Log Out" : "Log In"}
+            </button>
+        </div>
+    </div>
+</nav-bar>
+
+<script>
+    import { api } from "~/services/api";
+
+    class Navbar extends HTMLElement {
+        constructor() {
+            super();
+
+            const login = this.querySelector<HTMLElement>("#login");
+            const logout = this.querySelector<HTMLElement>("#logout");
+
+            if (login) {
+                login.onclick = async () => {
+                    const response = await api
+                        .collection("users")
+                        .authWithOAuth2({ provider: "google" });
+                    if (response) {
+                        document.cookie = `token=${response.token};`;
+                        location.reload();
+                    }
+                };
+            }
+
+            if (logout) {
+                logout.onclick = () => {
+                    document.cookie = "token=;";
+                    location.reload();
+                };
+            }
+        }
+    }
+
+    customElements.define("nav-bar", Navbar);
+</script>
