@@ -21,12 +21,17 @@ Fire up PocketBase like it’s your personal assistant. It’s just waiting to s
 ### Step 2: Create a Collection
 
 Create a collection called **"projects"** with a field called **name** (it’s a string, because we’re not trying to win any awards here) and another field called **authorID** that’s a relationship to the **"users"** collection. Relationships are important—just ask any relationship expert!
+<img width="670" alt="image" src="https://github.com/user-attachments/assets/d96ac912-8d39-49a9-8872-34e82cf8e7f6">
 
-### Step 3: Generate Types
+### Step 3: Set API Rules
+Don’t forget to set up the API rules to make sure your data is as secure as a taco stand at 3 AM. This step ensures only authorized users can access or modify the data. It’s like putting up a "No Trespassing" sign but for your app. <img width="667" alt="image" src="https://github.com/user-attachments/assets/215562e1-0ee7-4a6b-afcc-2cd8b79dafd0">
+
+
+### Step 4: Generate Types
 
 Run `bun sync` from the root to generate types using **PocketBase-Typegen**. This is where the magic happens—like watching your code go from “meh” to “wow!” It’s like watching a caterpillar turn into a butterfly, but less dramatic.
 
-### Step 4: Set Up the Environment
+### Step 5: Set Up the Environment
 
 Add an `.env` file inside the `ui/` directory with the following groundbreaking structure:
 
