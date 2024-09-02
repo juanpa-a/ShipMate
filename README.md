@@ -31,7 +31,7 @@ Run `bun sync` from the root to generate types using **PocketBase-Typegen**. Thi
 Add an `.env` file inside the `ui/` directory with the following groundbreaking structure:
 
 ```
-PUBLIC_BASE_API_URL="<http://127.0.0.1:8090>"
+PUBLIC_BASE_API_URL="http://127.0.0.1:8090"
 
 AUTH_TRUST_HOST=true
 AUTH_SECRET=""
