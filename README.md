@@ -33,13 +33,6 @@ Add an `.env` file inside the `ui/` directory with the following groundbreaking 
 
 ```
 PUBLIC_BASE_API_URL="http://127.0.0.1:8090"
-
-AUTH_TRUST_HOST=true
-AUTH_SECRET=""
-
-GOOGLE_CLIENT_ID=""
-GOOGLE_CLIENT_SECRET=""
-
 ```
 
 Feel free to fill in those Google secrets like you’re trying to win the lottery. Just don’t forget to keep them secret—no one wants their keys handed out like candy!
