@@ -59,3 +59,41 @@ And there you have it! **ShipMate**: the not-so-serious tool for serious develop
 ---
 
 Happy Shipping! 🚀
+
+## Authentication Flow
+
+This project uses PocketBase for authentication, integrated with Astro's server-side capabilities and client-side interactions. Here's a brief overview of how it works:
+
+1.  **PocketBase Setup**:
+    *   The PocketBase backend is defined in `api/main.go`.
+    *   User authentication relies on collections and API rules you define in your PocketBase admin UI (e.g., "users" collection, OAuth2 with Google).
+
+2.  **Server-Side (Astro Middleware - `ui/src/middleware.ts`)**:
+    *   For every request to the Astro application:
+        *   A new PocketBase SDK instance is created.
+        *   It attempts to load authentication details from a `token` cookie (if present).
+        *   If a token is found, it's validated, and an attempt is made to refresh it.
+        *   The server-side PocketBase instance, the authenticated user model, and the auth token (as a cookie string) are made available to Astro pages and components via `Astro.locals.api`, `Astro.locals.user`, and `Astro.locals.token` respectively.
+        *   The middleware also ensures that the `pb_auth` cookie (PocketBase's standard auth cookie) is set on the HTTP response, keeping it synchronized with the authentication state.
+
+3.  **Client-Side Shared PocketBase Instance (`ui/src/services/api.ts`)**:
+    *   A single, shared instance of the PocketBase SDK (`api`) is created for use throughout the client-side application (in `.astro` file `<script>` tags, Preact components, etc.).
+
+4.  **Client-Side Hydration (`ui/src/layouts/Layout.astro`)**:
+    *   To ensure the shared client-side `api` instance is aware of the user's authentication status (as determined by the server):
+        *   The `Astro.locals.token` (containing the auth cookie string) is passed from the server to a script in `Layout.astro`.
+        *   This script then calls `api.authStore.loadFromCookie(...)` on the shared client-side `api` instance, effectively hydrating its authentication state.
+        *   If no token is provided by the server (user is logged out), the client-side `api.authStore` is cleared.
+
+5.  **Login/Logout (`ui/src/components/Navbar.astro`)**:
+    *   **Login**: When a user logs in (e.g., via OAuth2):
+        *   The client-side script in `Navbar.astro` initiates the OAuth flow using the shared `api` instance.
+        *   Upon successful authentication, the shared `api.authStore` is *immediately updated* with the new token and user record.
+        *   A `token` cookie is set in the browser.
+        *   The page is reloaded. This ensures the middleware can pick up the new `token` cookie, validate the session on the server, and correctly set up `Astro.locals` for subsequent server-rendered parts and client-side hydration.
+    *   **Logout**:
+        *   The shared `api.authStore` is *immediately cleared*.
+        *   The `token` (and `pb_auth`) cookies are cleared in the browser.
+        *   The page is reloaded to reflect the logged-out state.
+
+This approach ensures that both server-rendered content (using `Astro.locals.api`) and client-side interactions (using the hydrated shared `api` instance) operate with the correct user authentication context.

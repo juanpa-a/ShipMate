@@ -6,6 +6,7 @@ interface Props {
 }
 
 const { title } = Astro.props;
+const authCookie = Astro.locals.token; // This now holds the cookie string from middleware
 ---
 
 <!doctype html>
@@ -21,6 +22,10 @@ const { title } = Astro.props;
             :root {
                 font-family: monospace;
             }
+            body { /* Apply default background to body if needed, or let Navbar/main handle it */
+                background-color: #18181b; /* Equivalent to zinc-900 or 950, adjust as needed */
+                margin: 0; /* Ensure no default body margin */
+            }
             main {
                 background:
                     url("noise.svg"),
@@ -29,7 +34,7 @@ const { title } = Astro.props;
                         rgba(100, 100, 100, 1) 1%,
                         rgba(0, 0, 0, 1) 100%
                     );
-                background-color: rgb(255, 255, 255);
+                /* background-color: rgb(255, 255, 255); */ /* This was likely overridden by zinc-950 on the main element class */
             }
         </style>
 
@@ -37,9 +42,25 @@ const { title } = Astro.props;
     <body>
         <Navbar />
         <main
-            class="flex w-screen bg-zinc-950 text-white h-screen justify-center items-center"
+            class="flex w-screen text-white min-h-screen justify-center items-center pt-16"
+            // pt-16 or similar to offset for fixed Navbar height, adjust as needed
         >
             <slot />
         </main>
+
+        <script define:vars={{ authCookie }}>
+			// Client-side script to hydrate the shared PocketBase instance
+			import { api } from "~/services/api";
+
+			if (authCookie) {
+				api.authStore.loadFromCookie(authCookie);
+				// console.log("Client API authStore loaded from cookie. Valid:", api.authStore.isValid);
+			} else {
+				// If no authCookie is passed (e.g., user logged out, token invalid server-side),
+				// ensure the client API's authStore is also cleared.
+				api.authStore.clear();
+				// console.log("Client API authStore cleared as no authCookie was provided.");
+			}
+		</script>
     </body>
 </html>
