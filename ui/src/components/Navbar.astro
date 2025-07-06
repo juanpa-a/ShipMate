@@ -33,20 +33,47 @@ const { token } = Astro.locals;
 
             if (login) {
                 login.onclick = async () => {
-                    const response = await api
-                        .collection("users")
-                        .authWithOAuth2({ provider: "google" });
-                    if (response) {
-                        document.cookie = `token=${response.token};`;
-                        location.reload();
+                    try {
+                        const response = await api
+                            .collection("users")
+                            .authWithOAuth2({ provider: "google" });
+
+                        if (response && response.token && response.record) {
+                            // Update the client-side auth store immediately
+                            api.authStore.save(response.token, response.record);
+
+                            // Set the cookie for server-side and subsequent visits
+                            // The middleware will handle setting pb_auth from this token cookie if needed,
+                            // or we can directly set pb_auth cookie here too.
+                            // For simplicity, we'll stick to the "token" cookie.
+                            const cookieOptions = "path=/; SameSite=Lax; Max-Age=604800;"; // Max-Age=7 days
+                            document.cookie = `token=${response.token}; ${cookieOptions}`;
+
+                            location.reload(); // Reload to reflect server-side changes and ensure consistency
+                        } else {
+                            console.error("OAuth login failed or response was incomplete:", response);
+                            // Potentially clear auth store if response is malformed but indicates failure
+                            api.authStore.clear();
+                        }
+                    } catch (error) {
+                        console.error("Error during OAuth login:", error);
+                        api.authStore.clear(); // Clear auth on error
                     }
                 };
             }
 
             if (logout) {
                 logout.onclick = () => {
-                    document.cookie = "token=;";
-                    location.reload();
+                    // Clear the client-side auth store immediately
+                    api.authStore.clear();
+
+                    // Clear the token cookie
+                    const pastDate = new Date(0).toUTCString();
+                    document.cookie = `token=; path=/; Expires=${pastDate}; SameSite=Lax;`;
+                    // Also attempt to clear PocketBase's own cookie if it was set client-side, though middleware should handle server-set ones.
+                    document.cookie = `pb_auth=; path=/; Expires=${pastDate}; SameSite=Lax;`;
+
+                    location.reload(); // Reload to reflect logged-out state
                 };
             }
         }
